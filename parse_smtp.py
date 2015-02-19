@@ -8,8 +8,6 @@ import hashlib
 
 # custom libs
 import parse_sessions
-import file_type
-
 
 class EmailAddress(object):
 	"""
@@ -102,18 +100,12 @@ class FileAttachment(object):
 
 		try:
 			self.size = len(buf)
-			# get the assumed mime type from the file extention
-			self.extension_type = file_type.check_file_type_from_extension(filename)
-			# get the file type from the file header (magic number)
-			self.header_type = file_type.check_file_type_from_buffer(buf)
 			# calculate the hashes
 			self.md5 = hashlib.md5(buf).hexdigest()
 			self.sha256 = hashlib.sha256(buf).hexdigest()
 		# in case of empty/corrupt file attachments
 		except:
 			self.size = 0
-			self.extension_type = ""
-			self.header_type = ""
 			self.md5 = ""
 			self.sha256 = ""
 
@@ -431,7 +423,8 @@ if __name__ == '__main__':
 
 	# checks to see if user supplied arguments
 	if len(sys.argv) < 2:
-		print sys.arg[0], '<filename.pcap>'
+		print sys.argv[0], '<filename.pcap>'
+        exit()
 
 	# first arg should be the filename of a pcap
 	f = sys.argv[1]
@@ -452,7 +445,6 @@ if __name__ == '__main__':
 			print email_session.plaintext
 			for attachment in email_session.attachments:
 				print 'Attachment:\t', attachment.filename, "("+str(attachment.size) + " bytes)"
-				print 'Type:\t\t', "ext:" + attachment.extension_type + " header:" + attachment.header_type
 				print 'MD5:\t\t', attachment.md5
 				print 'SHA256:\t\t', attachment.sha256
 #				with open(attachment.filename, "w") as f:
